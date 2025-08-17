@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HyperReda V1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #2E2238;
+            --card-color: #4C3A54;
+            --input-color: #3B2C42;
+            --primary-text: #EAE0F0;
+            --secondary-text: #C8A2C8;
+            --accent-color: #D8BFD8;
+            --button-text: #2E2238;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-align: center;
+            margin: 0 0 5px 0;
+        }
+        
+        h2 {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--secondary-text);
+            text-align: center;
+            margin: 0 0 25px 0;
+            border-bottom: 1px solid var(--input-color);
+            padding-bottom: 25px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--input-color);
+            border-radius: 8px;
+            background-color: var(--input-color);
+            color: var(--primary-text);
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--accent-color);
+            color: var(--button-text);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            margin-top: 15px;
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            color: #888;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #E6D2E6;
+        }
+        
+        button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        p.status { text-align: center; margin-top: 20px; font-style: italic; min-height: 20px; color: var(--secondary-text); }
+        
+        #essay-section { display: none; }
+        
+        #essayList { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; }
+        
+        #essayList li {
+            background-color: var(--input-color);
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        #essayList li.selected {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        #generated-title-display {
+            color: var(--accent-color);
+            font-style: italic;
+            min-height: 24px;
+            font-size: 1rem;
+            margin: 15px 0 5px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="login-section">
+            <h1>HyperReda V1</h1>
+            <h2>para Sala do Futuro</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="ra">RA + dígito + sp</label>
+                    <input type="text" id="ra" name="user" placeholder="ex: 000123456789sp" required>
+                </div>
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" placeholder="Sua senha da SED" required>
+                </div>
+                <button type="submit" id="loginButton">Conectar</button>
+            </form>
+            <p id="status" class="status"></p>
+        </div>
+
+        <div id="essay-section">
+            <h2>Selecione a Redação</h2>
+            <ul id="essayList"></ul>
+            <h4 id="generated-title-display"></h4>
+            <textarea id="essayText" placeholder="O texto da IA aparecerá aqui..." style="min-height: 200px;"></textarea>
+            <button id="generateEssayButton" disabled>Gerar Redação com IA 🤖</button>
+            <button id="submitEssayButton" disabled>Salvar Rascunho</button>
+            <p id="submissionStatus" class="status"></p>
+        </div>
+    </div>
+
+    <script>
+        let tokenB = null;
+        let essays = [];
+        let selectedTask = { id: null, details: null, fullData: null, generatedTitle: null };
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const statusEl = document.getElementById('status');
+            const loginButton = document.getElementById('loginButton');
+            statusEl.textContent = 'Conectando...';
+            loginButton.disabled = true;
+            try {
+                const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user: e.target.user.value, senha: e.target.senha.value }) });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
+                
+                tokenB = data.tokenB;
+                essays = data.tarefas; 
+                
+                document.getElementById('login-section').style.display = 'none';
+                displayEssays();
+            } catch (err) { 
+                statusEl.textContent = `Falha: ${err.message}`; 
+            } finally {
+                loginButton.disabled = false;
+            }
+        });
+
+        function displayEssays() {
+            const essaySection = document.getElementById('essay-section');
+            const essayList = document.getElementById('essayList');
+            const now = new Date();
+            const availableEssays = essays.filter(t => 
+                t.is_essay === true &&
+                t.answer_id !== null && 
+                t.answer_status !== 'pending' &&
+                new Date(t.publish_at) <= now && 
+                new Date(t.expire_at) > now
+            );
+            
+            essaySection.style.display = 'block';
+            if (availableEssays.length === 0) {
+                essayList.innerHTML = '<li>Nenhuma redação válida e iniciada (com rascunho) encontrada.</li>';
+                return;
+            }
+            essayList.innerHTML = availableEssays.map(essay => `<li data-task-id="${essay.id}">${essay.title}</li>`).join('');
+            document.querySelectorAll('#essayList li').forEach(li => li.addEventListener('click', handleEssaySelection));
+        }
+
+        async function handleEssaySelection(event) {
+            const li = event.currentTarget;
+            const taskId = li.dataset.taskId;
+            document.querySelectorAll('#essayList li').forEach(item => item.classList.remove('selected'));
+            li.classList.add('selected');
+
+            const taskData = essays.find(t => t.id == taskId);
+            if (!taskData) { alert('Erro: dados da tarefa não encontrados.'); return; }
+
+            selectedTask = { id: taskId, details: null, fullData: taskData, generatedTitle: null };
+            document.getElementById('generateEssayButton').disabled = true;
+            document.getElementById('submitEssayButton').disabled = true;
+            document.getElementById('generated-title-display').textContent = '';
+            document.getElementById('essayText').value = '';
+
+            const statusEl = document.getElementById('submissionStatus');
+            statusEl.textContent = 'Buscando proposta completa... 📚';
+
+            try {
+                const res = await fetch('/api/get-essay-details', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ tokenB, taskId, answerId: taskData.answer_id, publicationTarget: taskData.publication_target }) 
+                });
+                const details = await res.json();
+                if (!res.ok) throw new Error(details.error || 'Não foi possível carregar os detalhes.');
+                
+                selectedTask.details = details;
+                statusEl.textContent = 'Proposta carregada! Clique para gerar.';
+                document.getElementById('generateEssayButton').disabled = false;
+            } catch (err) {
+                statusEl.textContent = `Falha ao buscar detalhes: ${err.message}`;
+            }
+        }
+
+        document.getElementById('generateEssayButton').addEventListener('click', async () => {
+             if (!selectedTask.id || !selectedTask.details) return;
+            const statusEl = document.getElementById('submissionStatus');
+            const genButton = document.getElementById('generateEssayButton');
+            statusEl.textContent = 'IA escrevendo redação e título... 🤖⏳';
+            genButton.disabled = true;
+            try {
+                const res = await fetch('/api/generate-essay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ promptData: selectedTask.details }) });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.details || data.error);
+
+                selectedTask.generatedTitle = data.essayTitle;
+                document.getElementById('essayText').value = data.essayBody;
+                document.getElementById('generated-title-display').textContent = `"${data.essayTitle}"`;
+                
+                statusEl.textContent = 'Texto e título gerados! ✅';
+                document.getElementById('submitEssayButton').disabled = false;
+            } catch (err) {
+                statusEl.textContent = `Erro da IA: ${err.message} ❌`;
+            } finally {
+                genButton.disabled = false;
+            }
+        });
+
+        document.getElementById('submitEssayButton').addEventListener('click', async () => {
+            const essayText = document.getElementById('essayText').value;
+            const statusEl = document.getElementById('submissionStatus');
+            if (!selectedTask.id || !essayText.trim()) return;
+            
+            statusEl.textContent = 'Salvando rascunho... 🚀';
+            const submitBtn = document.getElementById('submitEssayButton');
+            submitBtn.disabled = true;
+            try {
+                const res = await fetch('/api/submit-essay', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ 
+                        tokenB: tokenB, 
+                        taskId: selectedTask.id, 
+                        answerId: selectedTask.fullData.answer_id,
+                        questionId: selectedTask.details.questionId,
+                        essayText: essayText, 
+                        essayTitle: selectedTask.generatedTitle,
+                        executedOn: selectedTask.fullData.publication_target
+                    }) 
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.details?.message || data.error);
+                statusEl.textContent = 'Rascunho salvo com sucesso! 🎉';
+            } catch (err) {
+                statusEl.textContent = `Falha ao salvar: ${err.message} ❌`;
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+  </html>
