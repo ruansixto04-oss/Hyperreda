@@ -3,260 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eclimax</title>
-    <script src="https://unpkg.com/feather-icons"></script>
+    <title>HyperReda V1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         :root {
-            --primary-color: #6a11cb; --primary-gradient: linear-gradient(135deg, #2575fc, #6a11cb);
-            --background-color: #f0f2f5; --card-background: #ffffff;
-            --text-color: #333; --text-light: #555;
-            --green: #28a745; --red: #dc3545; --orange: #fd7e14; --grey: #6c757d;
+            --bg-color: #2E2238;
+            --card-color: #4C3A54;
+            --input-color: #3B2C42;
+            --primary-text: #EAE0F0;
+            --secondary-text: #C8A2C8;
+            --accent-color: #D8BFD8;
+            --button-text: #2E2238;
         }
-        * { box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; margin: 0; background-color: var(--background-color); color: var(--text-color); }
-        button, select, input { font-family: 'Poppins', sans-serif; cursor: pointer; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-align: center;
+            margin: 0 0 5px 0;
+        }
         
-        #login-section { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: var(--primary-gradient); }
-        .login-card {
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.2);
+        h2 {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--secondary-text);
+            text-align: center;
+            margin: 0 0 25px 0;
+            border-bottom: 1px solid var(--input-color);
+            padding-bottom: 25px;
         }
-        .login-card h1 { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 25px; }
-        .login-card h1 svg { color: var(--primary-color); }
-        .input-group { position: relative; margin-bottom: 20px; }
-        .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
-        .input-group input { width: 100%; padding: 15px 15px 15px 50px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; background: #f7f7f7; }
-        .login-btn { width: 100%; padding: 15px; background: var(--primary-gradient); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; transition: transform 0.2s; }
-        .login-btn:hover { transform: scale(1.02); }
-        #error-message { color: var(--red); margin-top: 15px; font-weight: 600; min-height: 20px;}
 
-        #app-container { display: none; }
-        .main-content { padding: 20px; transition: margin-left 0.3s; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header-left, .header-right { display: flex; align-items: center; gap: 15px; }
-        .menu-btn { background: none; border: none; cursor: pointer; }
-        .avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--primary-color); color: white; display: flex; justify-content: center; align-items: center; font-weight: 600; font-size: 14px; }
-
-        .sidenav {
-            height: 100%; width: 0; position: fixed; z-index: 1001; top: 0; left: 0;
-            background-color: var(--card-background); overflow-x: hidden; transition: 0.3s;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        label {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            margin-bottom: 8px;
+            display: block;
         }
-        .sidenav-header { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; }
-        .sidenav a { padding: 15px 20px; text-decoration: none; font-size: 16px; color: var(--text-light); display: flex; align-items: center; gap: 15px; transition: 0.2s; border-left: 3px solid transparent; }
-        .sidenav a:hover, .sidenav a.active { background-color: #f8f9fa; color: var(--primary-color); border-left: 3px solid var(--primary-color); }
-        .sidenav .close-btn { position: absolute; top: 5px; right: 15px; font-size: 36px; color: #ccc; text-decoration: none; }
 
-        .greeting h2 { margin: 0; }
-        .greeting p { color: #777; margin: 5px 0 25px 0; }
-        .summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-        .card { background: var(--card-background); border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .card:hover { transform: translateY(-5px); transition: 0.2s; }
-        .card.clickable { cursor: pointer; }
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--input-color);
+            border-radius: 8px;
+            background-color: var(--input-color);
+            color: var(--primary-text);
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+        }
         
-        .task-card { margin-bottom: 15px; background: var(--card-background); border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .task-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px; }
-        .task-header h3 { margin: 0; font-size: 16px; line-height: 1.4; flex-grow: 1; }
-        .task-tag { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; color: white; white-space: nowrap; }
-        .task-tag.entregue { background-color: var(--green); } .task-tag.rascunho { background-color: var(--grey); } .task-tag.pendente { background-color: var(--orange); }
-        .task-tag.expirada { background-color: var(--red); } .task-tag.prova { background-color: var(--primary-color); } .task-tag.redacao { background-color: #2575fc; }
-        .task-button { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; transition: all 0.2s; }
-        .task-button.do { background: var(--primary-gradient); color: white; } .task-button.doing { background-color: var(--grey); color: white; cursor: not-allowed; }
-        .task-button.done { background-color: #e0e0e0; color: var(--text-light); cursor: not-allowed; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--accent-color);
+            color: var(--button-text);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            margin-top: 15px;
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            color: #888;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #E6D2E6;
+        }
+        
+        button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        p.status { text-align: center; margin-top: 20px; font-style: italic; min-height: 20px; color: var(--secondary-text); }
+        
+        #essay-section { display: none; }
+        
+        #essayList { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; }
+        
+        #essayList li {
+            background-color: var(--input-color);
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        #essayList li.selected {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        #generated-title-display {
+            color: var(--accent-color);
+            font-style: italic;
+            min-height: 24px;
+            font-size: 1rem;
+            margin: 15px 0 5px 0;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <section id="login-section">
-        <div class="login-card">
-            <h1><i data-feather="award"></i>Eclimax</h1>
+    <div class="container">
+        <div id="login-section">
+            <h1>HyperReda V1</h1>
+            <h2>para Sala do Futuro</h2>
             <form id="loginForm">
-                <div class="input-group"><i data-feather="user"></i><input type="text" id="ra" placeholder="Seu RA (com dígito e UF)" required></div>
-                <div class="input-group"><i data-feather="lock"></i><input type="password" id="senha" placeholder="Sua Senha" required></div>
-                <button type="submit" id="loginButton" class="login-btn">Entrar</button>
-                <div id="error-message"></div>
+                <div class="form-group">
+                    <label for="ra">RA + dígito + sp</label>
+                    <input type="text" id="ra" name="user" placeholder="ex: 000123456789sp" required>
+                </div>
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" placeholder="Sua senha da SED" required>
+                </div>
+                <button type="submit" id="loginButton">Conectar</button>
             </form>
-        </div>
-    </section>
-
-    <div id="app-container" style="display: none;">
-        <div id="mySidenav" class="sidenav">
-            <a href="javascript:void(0)" class="close-btn" onclick="closeNav()">&times;</a>
-            <div class="sidenav-header">
-                <div class="avatar" id="side-avatar">--</div>
-                <div>
-                    <strong id="side-user-name" style="display: block;"></strong>
-                    <span id="side-school-name" style="font-size: 12px;"></span>
-                </div>
-            </div>
-            <a href="#" class="nav-link active" data-target="dashboard-section"><i data-feather="home"></i> Home</a>
-            <a href="#" class="nav-link" data-target="tasks-section"><i data-feather="edit-3"></i> Tarefas</a>
+            <p id="status" class="status"></p>
         </div>
 
-        <div id="main" class="main-content">
-            <header class="header">
-                <div class="header-left">
-                    <button class="menu-btn" onclick="openNav()"><i data-feather="menu"></i></button>
-                    <h2 id="header-title">Dashboard</h2>
-                </div>
-                <div class="header-right">
-                    <div class="avatar" id="header-avatar">--</div>
-                </div>
-            </header>
-
-            <main>
-                <section id="dashboard-section">
-                    <div class="greeting">
-                        <h2>Olá, <span id="dash-user-name"></span>!</h2>
-                        <p>Seja bem-vindo de volta.</p>
-                    </div>
-                    <div class="summary-cards">
-                        <div class="card clickable" id="pendencias-card" onclick="navigateToTasks()">
-                           <h3>Pendências</h3><p id="pendencias-count">0</p>
-                        </div>
-                        <div class="card">
-                           <h3>Faltas</h3><p id="faltas-count">0</p>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="tasks-section" style="display: none;">
-                    </section>
-            </main>
+        <div id="essay-section">
+            <h2>Selecione a Redação</h2>
+            <ul id="essayList"></ul>
+            <h4 id="generated-title-display"></h4>
+            <textarea id="essayText" placeholder="O texto da IA aparecerá aqui..." style="min-height: 200px;"></textarea>
+            <button id="generateEssayButton" disabled>Gerar Redação com IA 🤖</button>
+            <button id="submitEssayButton" disabled>Salvar Rascunho</button>
+            <p id="submissionStatus" class="status"></p>
         </div>
     </div>
-        <script>
-        // --- SEÇÃO DE ELEMENTOS GLOBAIS ---
-        const loginSection = document.getElementById('login-section'), appContainer = document.getElementById('app-container'),
-              loginForm = document.getElementById('loginForm'), loginButton = document.getElementById('loginButton'),
-              errorMessageDiv = document.getElementById('error-message'), navLinks = document.querySelectorAll('.nav-link'),
-              headerTitle = document.getElementById('header-title'), mainContent = document.getElementById('main');
-        
-        let globalApiData = null, deliveredTasksCache = null, currentFilters = { room: 'all', status: 'all' };
 
-        // --- LÓGICA DE NAVEGAÇÃO E UI ---
-        function openNav() { document.getElementById("mySidenav").style.width = "280px"; }
-        function closeNav() { document.getElementById("mySidenav").style.width = "0"; }
-        
-        function navigateTo(targetId) {
-            document.querySelectorAll('#main section').forEach(section => section.style.display = 'none');
-            document.getElementById(targetId).style.display = 'block';
-            const targetLink = document.querySelector(`.nav-link[data-target="${targetId}"]`);
-            if (targetLink) {
-                headerTitle.textContent = targetLink.textContent.trim();
-                navLinks.forEach(l => l.classList.remove('active'));
-                targetLink.classList.add('active');
-            }
-            closeNav();
-        }
-        function navigateToTasks() { navigateTo('tasks-section'); }
+    <script>
+        let tokenB = null;
+        let essays = [];
+        let selectedTask = { id: null, details: null, fullData: null, generatedTitle: null };
 
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                navigateTo(link.getAttribute('data-target'));
-            });
-        });
-
-        // --- LÓGICA DE LOGIN ---
-        loginForm.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const ra = document.getElementById('ra').value, senha = document.getElementById('senha').value;
-            loginButton.disabled = true; loginButton.textContent = 'Carregando...'; errorMessageDiv.textContent = '';
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const statusEl = document.getElementById('status');
+            const loginButton = document.getElementById('loginButton');
+            statusEl.textContent = 'Conectando...';
+            loginButton.disabled = true;
             try {
-                // Lembre-se de usar a versão mais recente do seu /api/login.js
-                const response = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user: ra, senha: senha })});
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error || 'Falha no login');
+                const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user: e.target.user.value, senha: e.target.senha.value }) });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
                 
-                globalApiData = data;
+                tokenB = data.tokenB;
+                essays = data.tarefas; 
                 
-                const { userInfo, faltas, tarefas, roomUserData } = data;
-                const userName = userInfo.NAME.split(' ')[0];
-                const userInitials = userInfo.NAME.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                
-                // **CORREÇÃO APLICADA AQUI**
-                // Atualizando os elementos da UI com os IDs corretos do novo design
-                document.getElementById('dash-user-name').textContent = userName;
-                document.getElementById('side-user-name').textContent = userInfo.NAME;
-                document.getElementById('header-avatar').textContent = userInitials;
-                document.getElementById('side-avatar').textContent = userInitials;
-                
-                const schoolRoom = roomUserData?.rooms?.find(r => r.meta?.nome_escola && r.meta.nome_escola !== "NULL");
-                document.getElementById('side-school-name').textContent = schoolRoom ? schoolRoom.meta.nome_escola : 'Escola não identificada';
-                
-                document.getElementById('pendencias-count').textContent = tarefas.filter(t => ['pendente', 'rascunho'].includes(getTaskType(t).status)).length;
-                document.getElementById('faltas-count').textContent = faltas.length > 0 ? faltas[0].totalFaltasBimestre : 0;
-                
-                setupTasksScreen();
-                
-                loginSection.style.display = 'none';
-                appContainer.style.display = 'block';
-                navigateTo('dashboard-section');
-            } catch (error) {
-                errorMessageDiv.textContent = `Erro: ${error.message}`;
-                loginButton.disabled = false; loginButton.textContent = 'Entrar';
+                document.getElementById('login-section').style.display = 'none';
+                displayEssays();
+            } catch (err) { 
+                statusEl.textContent = `Falha: ${err.message}`; 
+            } finally {
+                loginButton.disabled = false;
             }
         });
 
-        // --- LÓGICA DA TELA DE TAREFAS ---
-        function setupTasksScreen() {
-            const tasksSection = document.getElementById('tasks-section');
-            // O conteúdo HTML da tela de tarefas, incluindo filtros e lista, será gerado aqui
-            // (Para manter o código limpo, vamos deixar as funções de renderização cuidarem disso)
-            tasksSection.innerHTML = `
-                <div class="filters">
-                    <select id="room-filter"></select>
-                    <select id="status-filter">
-                        <option value="all">Todos os Tipos</option>
-                        <option value="pendente">Pendentes</option>
-                        <option value="entregue">Entregues</option>
-                    </select>
-                </div>
-                <div id="tasks-list"></div>
-            `;
+        function displayEssays() {
+            const essaySection = document.getElementById('essay-section');
+            const essayList = document.getElementById('essayList');
+            const now = new Date();
+            const availableEssays = essays.filter(t => 
+                t.is_essay === true &&
+                t.answer_id !== null && 
+                t.answer_status !== 'pending' &&
+                new Date(t.publish_at) <= now && 
+                new Date(t.expire_at) > now
+            );
             
-            populateFilters(globalApiData.roomUserData);
-            renderTasks(); // Renderiza com os filtros padrão
-
-            // Adiciona listeners aos filtros
-            document.getElementById('room-filter').addEventListener('change', (e) => { currentFilters.room = e.target.value; renderTasks(); });
-            document.getElementById('status-filter').addEventListener('change', (e) => { currentFilters.status = e.target.value; renderTasks(); });
-        }
-        
-        // As funções abaixo (getTaskType, populateFilters, renderTasks, etc.) são placeholders
-        // e precisam ser preenchidas com a lógica completa que já desenvolvemos.
-        
-        function getTaskType(task) {
-             // Exemplo simplificado. Use a versão completa que já fizemos.
-            if(task.answer_status === 'finished') return { status: 'entregue' };
-            if(task.answer_status === 'draft') return { status: 'rascunho' };
-            return { status: 'pendente' };
+            essaySection.style.display = 'block';
+            if (availableEssays.length === 0) {
+                essayList.innerHTML = '<li>Nenhuma redação válida e iniciada (com rascunho) encontrada.</li>';
+                return;
+            }
+            essayList.innerHTML = availableEssays.map(essay => `<li data-task-id="${essay.id}">${essay.title}</li>`).join('');
+            document.querySelectorAll('#essayList li').forEach(li => li.addEventListener('click', handleEssaySelection));
         }
 
-        function populateFilters(roomsData) {
-            const roomFilter = document.getElementById('room-filter');
-            if (!roomFilter) return;
-            roomFilter.innerHTML = '<option value="all">Todas as Turmas</option>';
-            if (roomsData && Array.isArray(roomsData.rooms)) {
-                roomsData.rooms.forEach(room => roomFilter.add(new Option(room.topic || room.name, room.name)));
+        async function handleEssaySelection(event) {
+            const li = event.currentTarget;
+            const taskId = li.dataset.taskId;
+            document.querySelectorAll('#essayList li').forEach(item => item.classList.remove('selected'));
+            li.classList.add('selected');
+
+            const taskData = essays.find(t => t.id == taskId);
+            if (!taskData) { alert('Erro: dados da tarefa não encontrados.'); return; }
+
+            selectedTask = { id: taskId, details: null, fullData: taskData, generatedTitle: null };
+            document.getElementById('generateEssayButton').disabled = true;
+            document.getElementById('submitEssayButton').disabled = true;
+            document.getElementById('generated-title-display').textContent = '';
+            document.getElementById('essayText').value = '';
+
+            const statusEl = document.getElementById('submissionStatus');
+            statusEl.textContent = 'Buscando proposta completa... 📚';
+
+            try {
+                const res = await fetch('/api/get-essay-details', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ tokenB, taskId, answerId: taskData.answer_id, publicationTarget: taskData.publication_target }) 
+                });
+                const details = await res.json();
+                if (!res.ok) throw new Error(details.error || 'Não foi possível carregar os detalhes.');
+                
+                selectedTask.details = details;
+                statusEl.textContent = 'Proposta carregada! Clique para gerar.';
+                document.getElementById('generateEssayButton').disabled = false;
+            } catch (err) {
+                statusEl.textContent = `Falha ao buscar detalhes: ${err.message}`;
             }
         }
 
-        async function renderTasks() {
-            const tasksList = document.getElementById('tasks-list');
-            if (!tasksList) return;
-            if (!globalApiData) return;
-            tasksList.innerHTML = '<p style="text-align: center;">Carregando...</p>';
-            // Aqui entraria toda a lógica de buscar tarefas entregues (se necessário)
-            // e renderizar os cards com base nos filtros, como na versão anterior.
-            // Por enquanto, vamos deixar um aviso:
-            tasksList.innerHTML = '<p style-="text-align: center;">A lógica de renderização de tarefas precisa ser inserida aqui.</p>'
-        }
-        
-        feather.replace();
+        document.getElementById('generateEssayButton').addEventListener('click', async () => {
+             if (!selectedTask.id || !selectedTask.details) return;
+            const statusEl = document.getElementById('submissionStatus');
+            const genButton = document.getElementById('generateEssayButton');
+            statusEl.textContent = 'IA escrevendo redação e título... 🤖⏳';
+            genButton.disabled = true;
+            try {
+                const res = await fetch('/api/generate-essay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ promptData: selectedTask.details }) });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.details || data.error);
+
+                selectedTask.generatedTitle = data.essayTitle;
+                document.getElementById('essayText').value = data.essayBody;
+                document.getElementById('generated-title-display').textContent = `"${data.essayTitle}"`;
+                
+                statusEl.textContent = 'Texto e título gerados! ✅';
+                document.getElementById('submitEssayButton').disabled = false;
+            } catch (err) {
+                statusEl.textContent = `Erro da IA: ${err.message} ❌`;
+            } finally {
+                genButton.disabled = false;
+            }
+        });
+
+        document.getElementById('submitEssayButton').addEventListener('click', async () => {
+            const essayText = document.getElementById('essayText').value;
+            const statusEl = document.getElementById('submissionStatus');
+            if (!selectedTask.id || !essayText.trim()) return;
+            
+            statusEl.textContent = 'Salvando rascunho... 🚀';
+            const submitBtn = document.getElementById('submitEssayButton');
+            submitBtn.disabled = true;
+            try {
+                const res = await fetch('/api/submit-essay', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ 
+                        tokenB: tokenB, 
+                        taskId: selectedTask.id, 
+                        answerId: selectedTask.fullData.answer_id,
+                        questionId: selectedTask.details.questionId,
+                        essayText: essayText, 
+                        essayTitle: selectedTask.generatedTitle,
+                        executedOn: selectedTask.fullData.publication_target
+                    }) 
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.details?.message || data.error);
+                statusEl.textContent = 'Rascunho salvo com sucesso! 🎉';
+            } catch (err) {
+                statusEl.textContent = `Falha ao salvar: ${err.message} ❌`;
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
     </script>
 </body>
 </html>
